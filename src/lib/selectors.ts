@@ -141,6 +141,9 @@ export function marketFor(store: StoreRecord): MarketProfile {
 }
 
 export function insightStrip(store: StoreRecord) {
+  if (store.id === "plano") {
+    return "Your store is strongest on Customer Alignment and Pricing & Promotion, but trails top stores on Sales Associate Effectiveness and Inventory & Fulfillment.";
+  }
   const bench = clusterBenchmarks();
   const ahead = (Object.keys(ATTRIBUTE_META) as AttributeKey[])
     .filter((k) => store.attributes[k] >= bench.attributes[k].cluster)

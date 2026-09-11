@@ -1,69 +1,94 @@
+"use client";
+
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { MethodologyDrawer } from "@/components/methodology-drawer";
 import { StoreSelector } from "@/components/store-selector";
 import { cn } from "@/lib/utils";
 import type { StoreRecord } from "@/lib/types";
 
 const NAV = [
-  { n: "01", label: "Peer Comparison", href: "/peer-comparison" },
-  { n: "02", label: "Store Performance", href: "/store-performance" },
-  { n: "03", label: "Store & Market Opportunity", href: "/market-opportunity" },
+  { n: "01", label: "Peer Comparison", href: "/peer-comparison", id: "peer" },
+  { n: "02", label: "Opportunity Areas", href: "/store-performance", id: "opp" },
+  { n: "03", label: "Action Plan", href: "/market-opportunity", id: "plan" },
 ];
+
+function activeId(pathname: string) {
+  if (pathname === "/store-identity") return "profile";
+  if (pathname === "/peer-comparison") return "peer";
+  if (pathname.startsWith("/store-performance")) return "opp";
+  if (pathname === "/market-opportunity") return "plan";
+  return "";
+}
 
 export function AppShell({
   store,
   pathname,
   children,
+  fill = false,
 }: {
   store: StoreRecord;
   pathname: string;
   children: React.ReactNode;
+  fill?: boolean;
 }) {
   const q = `?store=${store.id}`;
+  const current = activeId(pathname);
   return (
-    <div className="min-h-full bg-background text-foreground">
-      <header className="border-b border-border bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ssb-blue">
-              Serta Simmons Bedding
-            </p>
-            <h1 className="text-base font-semibold text-ssb-navy">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#f3f7fb] text-foreground" suppressHydrationWarning>
+      <header className="shrink-0 border-b border-slate-200/80 bg-white">
+        <div className="mx-auto flex h-[56px] max-w-[1440px] items-center justify-between gap-4 px-6">
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-semibold leading-tight text-ssb-navy">
               Retailer Relationship Improvement Engine
-            </h1>
+            </p>
+            <p className="text-[11px] text-slate-500">Serta Simmons Retailers PoC</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             <StoreSelector current={store} />
-            <MethodologyDrawer />
+            <MethodologyDrawer
+              trigger={
+                <button
+                  type="button"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[15px] font-medium text-slate-500 hover:bg-slate-50"
+                  aria-label="Help and methodology"
+                >
+                  ?
+                </button>
+              }
+            />
+            <button type="button" className="ml-1 flex items-center gap-2 rounded-full py-1 pl-1 pr-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ssb-blue text-[11px] font-semibold text-white">
+                JD
+              </span>
+              <span className="hidden text-sm font-medium text-ssb-navy sm:inline">Jamie Davis</span>
+              <ChevronDown className="h-4 w-4 text-slate-400" />
+            </button>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 px-4 pb-2">
-          {NAV.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/peer-comparison" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={`${item.href}${q}`}
-                className={cn(
-                  "whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition",
-                  active
-                    ? "bg-ssb-blue text-white"
-                    : "text-ssb-navy hover:bg-ssb-blue-soft",
-                )}
-              >
-                <span className="mr-1.5 text-[10px] opacity-70">{item.n}</span>
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-      <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted-foreground">
-        PoC for independent retailer performance partnership. Peer names are masked unless the retailer is the selected store.
-      </footer>
+      <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col px-6 pt-2.5 pb-3">
+        <nav className="mb-1.5 flex shrink-0 flex-wrap items-center gap-x-1 text-[13px]">
+          {NAV.map((item, i) => (
+            <span key={item.href} className="flex items-center gap-1">
+              {i > 0 ? <span className="px-1 text-slate-300">›</span> : null}
+              <Link
+                href={`${item.href}${q}`}
+                className={cn("font-medium", current === item.id ? "text-ssb-blue" : "text-slate-400 hover:text-ssb-navy")}
+              >
+                {item.n}. {item.label}
+              </Link>
+            </span>
+          ))}
+          {pathname === "/store-identity" ? (
+            <span className="flex items-center gap-1">
+              <span className="px-1 text-slate-300">›</span>
+              <span className="font-medium text-ssb-blue">08. Store Profile</span>
+            </span>
+          ) : null}
+        </nav>
+        <main className={cn("min-h-0 flex-1", fill ? "overflow-hidden" : "overflow-y-auto")}>{children}</main>
+      </div>
     </div>
   );
 }
@@ -71,29 +96,15 @@ export function AppShell({
 export function PageHeader({
   title,
   subtitle,
-  question,
 }: {
   title: string;
   subtitle: string;
-  question: string;
+  question?: string;
 }) {
   return (
-    <div className="mb-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ssb-blue">{question}</p>
-      <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ssb-navy">{title}</h2>
-      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{subtitle}</p>
-    </div>
-  );
-}
-
-export function ColorLegend() {
-  return (
-    <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground">
-      <span className="flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-full bg-ssb-blue" /> Your store</span>
-      <span className="flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-full bg-ssb-grey" /> Cluster average</span>
-      <span className="flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-full bg-ssb-green" /> Top stores</span>
-      <span className="flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-full bg-ssb-amber" /> Opportunity</span>
-      <span className="flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-full bg-ssb-red" /> Needs attention</span>
+    <div className="mb-2 shrink-0">
+      <h2 className="text-[26px] font-semibold leading-tight tracking-tight text-ssb-navy">{title}</h2>
+      <p className="mt-0.5 text-[13px] text-slate-500">{subtitle}</p>
     </div>
   );
 }

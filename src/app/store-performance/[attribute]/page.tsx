@@ -1,13 +1,9 @@
-import { AppShell, ColorLegend, PageHeader } from "@/components/app-shell";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { CapabilityList } from "@/components/capability-list";
-import { DisplayGrid } from "@/components/display-grid";
-import { EvidenceBlock, EvidenceChip } from "@/components/evidence-chip";
-import { KpiBlock } from "@/components/kpi-block";
-import { NeedRows } from "@/components/need-rows";
-import { RecommendationCard } from "@/components/recommendation-card";
-import { BenchmarkRow } from "@/components/benchmark-row";
-import { DISPLAY_AUDIT } from "@/lib/data";
+import { AppShell, PageHeader } from "@/components/app-shell";
+import { ActionQuad } from "@/components/action-quad";
+import { AttributeScoreHeader } from "@/components/attribute-score-header";
+import { IconTile } from "@/components/icon-tile";
+import { InventoryScreen } from "@/components/inventory-screen";
+import { ShowroomFloor } from "@/components/showroom-floor";
 import {
   capabilitiesFor,
   clusterBenchmarks,
@@ -17,11 +13,17 @@ import {
   pricingFor,
   problemSkus,
   recommendation,
-  slotsFor,
 } from "@/lib/selectors";
 import type { AttributeKey } from "@/lib/types";
+import {
+  AlertTriangle,
+  BedDouble,
+  Megaphone,
+  Puzzle,
+  Truck,
+  Users,
+} from "lucide-react";
 import { notFound } from "next/navigation";
-import { Check, X } from "lucide-react";
 
 const SLUGS: Record<string, AttributeKey> = {
   "sales-associate": "salesAssociate",
@@ -31,35 +33,26 @@ const SLUGS: Record<string, AttributeKey> = {
   "inventory-fulfillment": "inventoryFulfillment",
 };
 
-const COPY: Record<
-  AttributeKey,
-  { title: string; question: string; header: (store: number, cluster: number, top: number) => string }
-> = {
+const COPY: Record<AttributeKey, { title: string; subtitle: string }> = {
   salesAssociate: {
     title: "Sales Associate Effectiveness",
-    question: "What behaviors separate my sales associates from high-performing stores?",
-    header: (s, c, t) =>
-      `${s}/100 · Cluster ${c} · Top ${t}. Product knowledge is relatively strong; customer discovery and objection handling are largest gaps.`,
+    subtitle: "What behaviors separate my sales associates from high-performing stores?",
   },
   customerAlignment: {
     title: "Customer Alignment",
-    question: "Does the assortment reflect what shoppers in this market actually need?",
-    header: (s) => `${s}/100 — Strong. Most major needs covered; Cooling and Value show identifiable gaps.`,
+    subtitle: "Does the assortment reflect what shoppers in this market actually need?",
   },
   displayAssortment: {
     title: "Display & Assortment",
-    question: "Are scarce showroom positions occupied by the right products?",
-    header: (s) => `${s}/100. 5 of 31 display positions materially underperform top-peer productivity.`,
+    subtitle: "Explore your showroom layout, display productivity, and opportunities to better meet customer needs.",
   },
   pricingPromotion: {
     title: "Pricing & Promotion",
-    question: "Are we creating enough customer value while protecting revenue and margin?",
-    header: (s) => `${s}/100 — Above Average. Largest gap is premium step-up conversion.`,
+    subtitle: "Are we creating enough customer value while protecting revenue and margin?",
   },
   inventoryFulfillment: {
     title: "Inventory & Fulfillment",
-    question: "Can the store deliver what the shopper wants, when the shopper wants it?",
-    header: (s) => `${s}/100 — Needs Attention. Availability and delivery are the biggest operational constraints.`,
+    subtitle: "Strengthen availability and delivery to capture more demand.",
   },
 };
 
@@ -82,203 +75,213 @@ export default async function AttributePage({
   const bench = clusterBenchmarks().attributes[key];
   const score = store.attributes[key];
   const copy = COPY[key];
-  const q = `?store=${store.id}`;
+  const storeLabel = `${store.name} – ${store.city}, ${store.state}`;
+
+  if (key === "displayAssortment") {
+    return (
+      <AppShell store={store} pathname="/store-performance" fill>
+        <div className="flex h-full min-h-0 flex-col">
+          <div className="mb-2 flex shrink-0 items-start justify-between gap-3">
+            <PageHeader title={copy.title} subtitle={copy.subtitle} />
+            <div className="flex items-center gap-2 pt-1">
+              <AttributeScoreHeader
+                storeLabel={storeLabel}
+                storeScore={score}
+                clusterScore={bench.cluster}
+                topScore={bench.top}
+              />
+              <div className="max-w-[220px] rounded-[16px] bg-[#eaf3ff] px-3 py-2">
+                <p className="flex items-start gap-1.5 text-[11px] leading-snug text-ssb-navy">
+                  <Megaphone className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ssb-blue" />
+                  <span>
+                    <span className="font-semibold">5 of 31 display positions</span> materially underperform top-peer
+                    productivity.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mb-2.5 grid shrink-0 grid-cols-4 gap-2.5">
+            <MiniKpi icon={<BedDouble className="h-4 w-4" />} tone="blue" value="31" label="Display Slots" />
+            <MiniKpi icon={<span className="text-sm font-bold">$</span>} tone="green" value="$24.8K" label="Revenue / Slot" />
+            <MiniKpi icon={<AlertTriangle className="h-4 w-4" />} tone="amber" value="5" label="Underproductive Slots" />
+            <MiniKpi icon={<Puzzle className="h-4 w-4" />} tone="violet" value="2" label="Customer-Need Gaps" />
+          </div>
+          <ShowroomFloor />
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (key === "inventoryFulfillment") {
+    return (
+      <AppShell store={store} pathname="/store-performance" fill>
+        <div className="flex h-full min-h-0 flex-col">
+          <div className="mb-2 flex shrink-0 items-end justify-between gap-4">
+            <PageHeader title={copy.title} subtitle={copy.subtitle} />
+            <AttributeScoreHeader
+              storeLabel={storeLabel}
+              storeScore={score}
+              clusterScore={bench.cluster}
+              topScore={bench.top}
+            />
+          </div>
+          <div className="mb-2.5 flex shrink-0 items-start gap-2 rounded-[16px] bg-[#eaf3ff] px-4 py-2">
+            <IconTile tone="blue" size="sm">
+              <Truck className="h-3.5 w-3.5" />
+            </IconTile>
+            <p className="text-[13px] leading-snug text-ssb-navy">
+              <span className="font-semibold">Availability and delivery are the biggest operational constraints on demand capture. </span>
+              Improving in-stock levels and delivery performance helps you convert more shoppers and reduce lost sales.
+            </p>
+          </div>
+          <InventoryScreen metrics={inventoryFor(store)} skus={problemSkus()} rec={recommendation(key)} />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
-    <AppShell store={store} pathname="/store-performance">
-      <Breadcrumbs
-        items={[
-          { label: "Peer Comparison", href: `/peer-comparison${q}` },
-          { label: "Store Performance", href: `/store-performance${q}` },
-          { label: copy.title },
-        ]}
-      />
-      <PageHeader title={copy.title} subtitle={copy.header(score, bench.cluster, bench.top)} question={copy.question} />
-      <div className="mb-5">
-        <ColorLegend />
+    <AppShell store={store} pathname="/store-performance" fill>
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="mb-2 flex shrink-0 items-end justify-between gap-4">
+          <PageHeader title={copy.title} subtitle={copy.subtitle} />
+          <AttributeScoreHeader
+            storeLabel={storeLabel}
+            storeScore={score}
+            clusterScore={bench.cluster}
+            topScore={bench.top}
+          />
+        </div>
+        {key === "salesAssociate" ? <SalesFill storeId={store.id} /> : null}
+        {key === "customerAlignment" ? <AlignmentFill storeId={store.id} /> : null}
+        {key === "pricingPromotion" ? <PricingFill storeId={store.id} /> : null}
       </div>
-      {key === "salesAssociate" ? <SalesBody storeId={store.id} /> : null}
-      {key === "customerAlignment" ? <AlignmentBody storeId={store.id} /> : null}
-      {key === "displayAssortment" ? <DisplayBody storeId={store.id} /> : null}
-      {key === "pricingPromotion" ? <PricingBody storeId={store.id} /> : null}
-      {key === "inventoryFulfillment" ? <InventoryBody storeId={store.id} /> : null}
     </AppShell>
   );
 }
 
-function SalesBody({ storeId }: { storeId: string }) {
+function MiniKpi({
+  icon,
+  tone,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  tone: "blue" | "green" | "amber" | "violet";
+  value: string;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-[16px] border border-slate-200 bg-white px-4 py-2.5">
+      <IconTile tone={tone} size="sm">
+        {icon}
+      </IconTile>
+      <div>
+        <p className="text-[22px] font-semibold leading-none text-ssb-navy">{value}</p>
+        <p className="text-[11px] text-slate-400">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function SalesFill({ storeId }: { storeId: string }) {
   const store = getStore(storeId);
   const caps = capabilitiesFor(store);
   return (
-    <div className="space-y-5">
-      <CapabilityList capabilities={caps} />
-      <EvidenceBlock kind="peer" title="Top-peer evidence">
-        Top peer stores consistently identify more sleep needs before recommending product.
-      </EvidenceBlock>
-      <EvidenceBlock kind="competitor" title="Competitor evidence">
-        Mattress Firm BedEd trains Sleep Experts around mattress type, features and sleep preferences. Tempur-Pedic
-        flagship stores use one-on-one trained guidance as part of the buying experience.
-      </EvidenceBlock>
-      <RecommendationCard recommendation={recommendation("salesAssociate")} />
-    </div>
-  );
-}
-
-function AlignmentBody({ storeId }: { storeId: string }) {
-  const store = getStore(storeId);
-  return (
-    <div className="space-y-5">
-      <NeedRows needs={needsFor(store)} />
-      <div className="flex flex-wrap gap-1.5">
-        <EvidenceChip source={{ label: "Customer survey", kind: "store" }} />
-        <EvidenceChip source={{ label: "Local search / site behavior", kind: "store" }} />
-        <EvidenceChip source={{ label: "Sales", kind: "store" }} />
-        <EvidenceChip source={{ label: "Product master", kind: "store" }} />
-        <EvidenceChip source={{ label: "Assortment", kind: "store" }} />
-      </div>
-      <EvidenceBlock kind="peer" title="Top-peer proof">
-        Top stores carry and display more cooling options across price bands.
-      </EvidenceBlock>
-      <EvidenceBlock kind="competitor" title="Competitor proof">
-        Leading retailers treat cooling, pressure relief and motion isolation as guided sleep benefits, not just
-        construction features.
-      </EvidenceBlock>
-      <RecommendationCard recommendation={recommendation("customerAlignment")} />
-    </div>
-  );
-}
-
-function DisplayBody({ storeId }: { storeId: string }) {
-  const store = getStore(storeId);
-  const slots = slotsFor(store);
-  const under = slots.filter((s) => s.tone === "underproductive").length;
-  const revenuePerSlot = Math.round(slots.reduce((a, s) => a + s.monthlyRevenue, 0) / slots.length);
-  return (
-    <div className="space-y-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiBlock label="Display slots" value={`${slots.length}`} />
-        <KpiBlock label="Revenue / slot" value={`$${(revenuePerSlot / 1000).toFixed(1)}K`} tone="blue" />
-        <KpiBlock label="Underproductive slots" value={`${under}`} tone="red" />
-        <KpiBlock label="Customer-need gaps" value="2" tone="amber" hint="Cooling and Value" />
-      </div>
-      <DisplayGrid slots={slots} />
-      <details className="rounded-2xl border border-border bg-white p-4">
-        <summary className="cursor-pointer font-semibold text-ssb-navy">Secondary merchandising metrics</summary>
-        <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          <li>Revenue / slot vs top-peer median</li>
-          <li>Margin / slot</li>
-          <li>Unit velocity</li>
-          <li>Trial-to-sale conversion</li>
-          <li>Price-point coverage</li>
-          <li>Need coverage and duplicate coverage</li>
-          <li>Display age</li>
-        </ul>
-      </details>
-      <div className="rounded-2xl border border-border bg-white p-4">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Qualitative showroom audit
+    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+      <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
+        <p className="mb-2 flex items-center gap-2 text-[14px] font-semibold text-ssb-navy">
+          <IconTile tone="blue" size="sm">
+            <Users className="h-3.5 w-3.5" />
+          </IconTile>
+          Capability Benchmark
         </p>
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {DISPLAY_AUDIT.map((item) => (
-            <li key={item.label} className="flex items-center gap-2 text-sm">
-              {item.pass ? <Check className="h-4 w-4 text-ssb-green" /> : <X className="h-4 w-4 text-ssb-red" />}
-              {item.label}
+        <ul className="min-h-0 flex-1 space-y-1.5 overflow-hidden">
+          {caps.map((cap) => (
+            <li key={cap.id} className="grid grid-cols-[1fr_44px_44px_44px] items-center gap-2 rounded-xl bg-[#f6f9fc] px-3 py-1.5">
+              <div>
+                <p className="text-[12px] font-semibold text-ssb-navy">{cap.label}</p>
+                <p className="text-[10px] leading-tight text-slate-400">{cap.insight}</p>
+              </div>
+              <p className="text-right text-[13px] font-semibold tabular-nums text-ssb-navy">{cap.store}</p>
+              <p className="text-right text-[12px] tabular-nums text-slate-400">{cap.cluster}</p>
+              <p className="text-right text-[12px] tabular-nums text-slate-400">{cap.top}</p>
             </li>
           ))}
         </ul>
-      </div>
-      <EvidenceBlock kind="competitor" title="Competitor proof">
-        Tempur-Pedic flagship stores emphasize tactile product trial, bedroom-like presentation and guided benefit
-        merchandising rather than undifferentiated rows of similar pillow-tops.
-      </EvidenceBlock>
-      <RecommendationCard recommendation={recommendation("displayAssortment")} />
+      </section>
+      <ActionQuad recommendation={recommendation("salesAssociate")} intro="Close the gap on needs discovery and objection handling." />
     </div>
   );
 }
 
-function PricingBody({ storeId }: { storeId: string }) {
+function AlignmentFill({ storeId }: { storeId: string }) {
+  const store = getStore(storeId);
+  const needs = needsFor(store);
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+      <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
+        <p className="mb-2 text-[14px] font-semibold text-ssb-navy">Need Coverage vs Local Demand</p>
+        <ul className="min-h-0 flex-1 space-y-1.5">
+          {needs.map((need) => (
+            <li key={need.id} className="rounded-xl bg-[#f6f9fc] px-3 py-1.5">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-[12px] font-semibold text-ssb-navy">{need.label}</span>
+                <span
+                  className={
+                    need.status === "Covered"
+                      ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-green"
+                      : need.status === "Watch"
+                        ? "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-amber"
+                        : "rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-red"
+                  }
+                >
+                  {need.status}
+                </span>
+              </div>
+              <div className="relative h-1.5 rounded-full bg-slate-200">
+                <div className="absolute inset-y-0 left-0 rounded-full bg-slate-300" style={{ width: `${need.demand}%` }} />
+                <div className="absolute inset-y-0 left-0 rounded-full bg-ssb-blue" style={{ width: `${need.coverage}%` }} />
+              </div>
+              <p className="mt-0.5 text-[10px] text-slate-400">
+                Demand {need.demand} · Coverage {need.coverage} · Top peer {need.topPeerMedian}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <ActionQuad recommendation={recommendation("customerAlignment")} intro="Expand cooling where local demand is high and coverage is thin." />
+    </div>
+  );
+}
+
+function PricingFill({ storeId }: { storeId: string }) {
   const store = getStore(storeId);
   const metrics = pricingFor(store);
   return (
-    <div className="space-y-5">
-      <div className="space-y-3">
-        {metrics.map((m) => (
-          <BenchmarkRow
-            key={m.id}
-            label={m.label}
-            store={m.storeNumeric}
-            cluster={m.peerNumeric}
-            top={m.topNumeric}
-            max={m.format === "currency" ? 2200 : 100}
-            unit=""
-            invert={m.id === "discount"}
-            insight={`${m.storeValue} vs peer / top benchmarks`}
-          />
-        ))}
-      </div>
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ssb-amber">Biggest gap</p>
-        <p className="mt-1 font-semibold text-ssb-navy">Premium step-up</p>
-        <p className="text-sm text-muted-foreground">Customers often buy within the first tier shown.</p>
-      </div>
-      <EvidenceBlock kind="peer" title="Top-peer proof">
-        Top stores convert more customers into premium propositions without materially higher discounting.
-      </EvidenceBlock>
-      <EvidenceBlock kind="competitor" title="Competitor proof">
-        Guided consultation, complete sleep-system selling and financing communication are standard at Tempur-Pedic
-        stores and Mattress Firm Sleep Expert programs.
-      </EvidenceBlock>
-      <RecommendationCard recommendation={recommendation("pricingPromotion")} />
-    </div>
-  );
-}
-
-function InventoryBody({ storeId }: { storeId: string }) {
-  const store = getStore(storeId);
-  const metrics = inventoryFor(store);
-  const skus = problemSkus();
-  return (
-    <div className="space-y-5">
-      <div className="space-y-3">
-        {metrics.map((m) => (
-          <BenchmarkRow
-            key={m.id}
-            label={m.label}
-            store={m.storeNumeric}
-            cluster={m.peerNumeric}
-            top={m.topNumeric}
-            max={m.id === "lead" ? 8 : m.id === "turns" ? 8 : 100}
-            unit=""
-            invert={m.id === "stockout" || m.id === "lead" || m.id === "slow"}
-            insight={m.storeValue}
-          />
-        ))}
-      </div>
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ssb-red">Primary constraint</p>
-        <p className="mt-1 font-semibold text-ssb-navy">High-demand SKU availability</p>
-      </div>
-      <div className="rounded-2xl border border-border bg-white p-4">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Top 3 problem SKUs
-        </p>
-        <ul className="space-y-2">
-          {skus.map((sku) => (
-            <li key={sku.name} className="flex items-center justify-between text-sm">
-              <span className="font-medium text-ssb-navy">{sku.name}</span>
-              <span className="tabular-nums text-ssb-red">{sku.stockOuts} stock-outs</span>
+    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+      <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
+        <p className="mb-2 text-[14px] font-semibold text-ssb-navy">Pricing Benchmark</p>
+        <ul className="space-y-1.5">
+          {metrics.map((m) => (
+            <li key={m.id} className="grid grid-cols-[1fr_70px_70px_70px] items-center gap-2 rounded-xl bg-[#f6f9fc] px-3 py-2">
+              <p className="text-[12px] font-semibold text-ssb-navy">{m.label}</p>
+              <p className="text-right text-[13px] font-semibold tabular-nums text-ssb-navy">{m.storeValue}</p>
+              <p className="text-right text-[12px] tabular-nums text-slate-400">
+                {m.format === "currency" ? `$${m.peerNumeric.toLocaleString("en-US")}` : `${m.peerNumeric}%`}
+              </p>
+              <p className="text-right text-[12px] tabular-nums text-slate-400">
+                {m.format === "currency" ? `$${m.topNumeric.toLocaleString("en-US")}` : `${m.topNumeric}%`}
+              </p>
             </li>
           ))}
         </ul>
-      </div>
-      <EvidenceBlock kind="peer" title="Top-peer proof">
-        Top peers combine higher availability with faster turns.
-      </EvidenceBlock>
-      <EvidenceBlock kind="competitor" title="Competitor proof">
-        Mattress Firm offers delivery tracking so customers can see fulfillment progress. Tempur-Pedic flagship
-        experience includes white-glove setup.
-      </EvidenceBlock>
-      <RecommendationCard recommendation={recommendation("inventoryFulfillment")} />
+        <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-[12px] text-ssb-navy">
+          <span className="font-semibold">Biggest gap: </span>Premium step-up. Customers often buy within the first tier shown.
+        </div>
+      </section>
+      <ActionQuad recommendation={recommendation("pricingPromotion")} intro="Standardize Good / Better / Best after needs discovery." />
     </div>
   );
 }

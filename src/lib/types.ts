@@ -47,6 +47,8 @@ export type StoreIdentity = {
     role: string;
     tenureYears: number;
     trainingComplete: boolean;
+    trainingPct: number;
+    initials: string;
   }[];
 };
 
@@ -119,6 +121,7 @@ export type InventoryMetric = {
 export type ProblemSku = {
   name: string;
   stockOuts: number;
+  lostSalesShare: number;
 };
 
 export type MarketProfile = {

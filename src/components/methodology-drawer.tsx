@@ -11,15 +11,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { BookOpen } from "lucide-react";
+import type { ReactNode } from "react";
 
-export function MethodologyDrawer() {
+export function MethodologyDrawer({ trigger }: { trigger?: ReactNode }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-full bg-white">
-          <BookOpen className="h-4 w-4" />
-          Sources & Methodology
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" size="sm" className="rounded-full bg-white">
+            <BookOpen className="h-4 w-4" />
+            Sources & Methodology
+          </Button>
+        )}
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md">
         <SheetHeader>

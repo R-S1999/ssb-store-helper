@@ -16,8 +16,8 @@ import type {
 export const DEFAULT_STORE_ID = "plano";
 
 export const CLUSTER_BENCHMARKS = {
-  overallCluster: 70,
-  overallTop: 88,
+  overallCluster: 74,
+  overallTop: 91,
   attributes: {
     salesAssociate: { cluster: 72, top: 88 },
     customerAlignment: { cluster: 74, top: 89 },
@@ -49,37 +49,49 @@ export const CLUSTER = {
 
 export const ATTRIBUTE_META: Record<
   AttributeKey,
-  { label: string; href: string; icon: string; question: string }
+  { label: string; href: string; icon: string; question: string; blurb: string; profileInsight: string }
 > = {
   salesAssociate: {
     label: "Sales Associate Effectiveness",
     href: "/store-performance/sales-associate",
     icon: "users",
     question: "What behaviors separate my sales associates from high-performing stores?",
+    blurb: "Knowledge, selling quality and customer discovery",
+    profileInsight:
+      "Associates know the products, but top stores perform better in needs discovery and objection handling.",
   },
   customerAlignment: {
     label: "Customer Alignment",
     href: "/store-performance/customer-alignment",
     icon: "target",
     question: "Does the assortment reflect what shoppers in this market actually need?",
+    blurb: "How well your assortment matches local customer needs",
+    profileInsight: "Your assortment closely matches the dominant customer needs in your market.",
   },
   displayAssortment: {
     label: "Display & Assortment",
     href: "/store-performance/display-assortment",
     icon: "layout",
     question: "Are scarce showroom positions occupied by the right products?",
+    blurb: "Display productivity, assortment mix and showroom execution",
+    profileInsight:
+      "Several display slots are underproductive and some high-demand needs are underrepresented.",
   },
   pricingPromotion: {
     label: "Pricing & Promotion",
     href: "/store-performance/pricing-promotion",
     icon: "tag",
     question: "Are we creating enough customer value while protecting revenue and margin?",
+    blurb: "Price positioning, promotions and value realization",
+    profileInsight: "Promotional participation is strong, but premium step-up conversion can improve.",
   },
   inventoryFulfillment: {
     label: "Inventory & Fulfillment",
     href: "/store-performance/inventory-fulfillment",
     icon: "truck",
     question: "Can the store deliver what the shopper wants, when the shopper wants it?",
+    blurb: "Availability, stock flow and delivery readiness",
+    profileInsight: "Frequent stock-outs and slower delivery times are limiting demand capture.",
   },
 };
 
@@ -102,20 +114,29 @@ export const COMPETITOR_SOURCES: Source[] = [
 ];
 
 const identityBase = {
-  storeType: "Independent full-line mattress retailer",
-  tradeArea: "Suburban growth corridor",
-  sellingSpaceSqFt: 6800,
-  mattressSellingSpaceSqFt: 5200,
+  storeType: "Full-Line Furniture + Mattress",
+  tradeArea: "Suburban Growth",
+  sellingSpaceSqFt: 9800,
+  mattressSellingSpaceSqFt: 3400,
   displaySlots: 31,
-  pricePosition: "Mid-premium, $799–$3,499",
-  brands: ["Serta", "Beautyrest", "Tempur", "Private label"],
-  ssbModels: 18,
+  pricePosition: "Mid-Premium",
+  brands: ["Serta", "Beautyrest", "Tempur", "Private label", "Hybrid Co.", "CoolSleep", "ValueRest"],
+  ssbModels: 12,
 };
 
 function associates(
-  names: { name: string; tenureYears: number; trainingComplete: boolean }[],
+  names: { name: string; tenureYears: number; trainingComplete: boolean; trainingPct?: number }[],
 ): StoreRecord["identity"]["associates"] {
-  return names.map((n) => ({ ...n, role: "Sales Associate" }));
+  return names.map((n) => ({
+    ...n,
+    role: "Sales Associate",
+    trainingPct: n.trainingPct ?? (n.trainingComplete ? 100 : 70),
+    initials: n.name
+      .split(" ")
+      .map((p) => p[0])
+      .join("")
+      .replace(".", ""),
+  }));
 }
 
 export const STORES: StoreRecord[] = [
@@ -308,11 +329,11 @@ export const STORES: StoreRecord[] = [
       householdBase: 48200,
       medianIncome: 96000,
       associates: associates([
-        { name: "Sarah M.", tenureYears: 4.6, trainingComplete: true },
-        { name: "John D.", tenureYears: 2.1, trainingComplete: true },
-        { name: "Maria R.", tenureYears: 5.8, trainingComplete: true },
-        { name: "David L.", tenureYears: 1.3, trainingComplete: false },
-        { name: "Amy P.", tenureYears: 3.4, trainingComplete: true },
+        { name: "Sarah M.", tenureYears: 2.5, trainingComplete: true, trainingPct: 100 },
+        { name: "John D.", tenureYears: 1.8, trainingComplete: true, trainingPct: 80 },
+        { name: "Maria R.", tenureYears: 4.2, trainingComplete: true, trainingPct: 100 },
+        { name: "David L.", tenureYears: 1.1, trainingComplete: false, trainingPct: 60 },
+        { name: "Amy P.", tenureYears: 3.0, trainingComplete: true, trainingPct: 80 },
       ]),
     },
   },
@@ -769,18 +790,18 @@ export const PLANO_PRICING: PricingMetric[] = [
 ];
 
 export const PLANO_INVENTORY: InventoryMetric[] = [
-  { id: "instock", label: "In-Stock", storeValue: "89%", storeNumeric: 89, peerNumeric: 93, topNumeric: 97 },
-  { id: "stockout", label: "Stock-Out", storeValue: "11%", storeNumeric: 11, peerNumeric: 7, topNumeric: 3 },
-  { id: "fill", label: "Fill Rate", storeValue: "91%", storeNumeric: 91, peerNumeric: 94, topNumeric: 98 },
-  { id: "lead", label: "Delivery Lead Time", storeValue: "4.8 days", storeNumeric: 4.8, peerNumeric: 3.6, topNumeric: 2.4 },
-  { id: "turns", label: "Inventory Turns", storeValue: "3.8x", storeNumeric: 3.8, peerNumeric: 4.4, topNumeric: 5.6 },
-  { id: "slow", label: "Slow Movers", storeValue: "17%", storeNumeric: 17, peerNumeric: 12, topNumeric: 7 },
+  { id: "instock", label: "In-Stock Rate", storeValue: "89%", storeNumeric: 89, peerNumeric: 94, topNumeric: 98 },
+  { id: "stockout", label: "Stock-Out Rate", storeValue: "11%", storeNumeric: 11, peerNumeric: 6, topNumeric: 2 },
+  { id: "fill", label: "Order Fill Rate", storeValue: "91%", storeNumeric: 91, peerNumeric: 96, topNumeric: 99 },
+  { id: "lead", label: "Delivery Lead Time", storeValue: "4.8 days", storeNumeric: 4.8, peerNumeric: 3.1, topNumeric: 1.8 },
+  { id: "turns", label: "Inventory Turns", storeValue: "3.8x", storeNumeric: 3.8, peerNumeric: 4.4, topNumeric: 5.2 },
+  { id: "slow", label: "Slow Movers", storeValue: "17%", storeNumeric: 17, peerNumeric: 12, topNumeric: 6 },
 ];
 
 export const PLANO_SKUS: ProblemSku[] = [
-  { name: "Beautyrest PressureSmart Queen", stockOuts: 8 },
-  { name: "Serta Perfect Sleeper Cooling Queen", stockOuts: 6 },
-  { name: "Serta iComfort Hybrid King", stockOuts: 5 },
+  { name: "Beautyrest X", stockOuts: 8, lostSalesShare: 32 },
+  { name: "Serta Y", stockOuts: 6, lostSalesShare: 24 },
+  { name: "Serta Z", stockOuts: 5, lostSalesShare: 19 },
 ];
 
 export const PLANO_MARKET: MarketProfile = {
@@ -844,19 +865,19 @@ export const RECOMMENDATIONS: Record<AttributeKey | "market", Recommendation> = 
     ],
   },
   displayAssortment: {
-    action: "Replace an underproductive premium-comfort slot with a differentiated cooling proposition",
-    why: "5 of 31 display positions materially underperform top-peer productivity, including duplicate pillow-tops and aged floor models.",
-    topPeer: "Top peers keep scarce slots aligned to high-demand needs and refresh underproductive positions on a 60-day test cadence.",
+    action: "Replace Display 14 with a Differentiated Cooling Proposition",
+    why: "Cooling is a high-demand need in your market and this display is significantly below top-peer productivity.",
+    topPeer: "Top stores feature cooling-focused models in 80% of similar display positions.",
     competitor:
-      "Tempur-Pedic flagship stores emphasize tactile product trial and a bedroom-like, guided showroom experience rather than dense, undifferentiated rows.",
+      "Leading mattress retailers use showroom space to clearly differentiate sleep benefits and encourage guided in-store trial.",
     whatToDo:
-      "Run a 60-day slot test: pull the lowest-revenue duplicate pillow-top and install a cooling hybrid with benefit-led signage and a trial script.",
+      "Replace with a differentiated cooling mattress. Add clear benefit messaging. Enable associate guided trial.",
     priority: "High",
     sources: [
-      { label: "POS by Display Slot", kind: "store" },
-      { label: "Showroom Audit", kind: "store" },
-      { label: "Top Peers", kind: "peer" },
-      COMPETITOR_SOURCES[1],
+      { label: "Display Productivity", kind: "store" },
+      { label: "Merchandising Audit", kind: "store" },
+      { label: "Sales History", kind: "store" },
+      { label: "Customer Need Map", kind: "store" },
     ],
   },
   pricingPromotion: {
@@ -876,23 +897,23 @@ export const RECOMMENDATIONS: Record<AttributeKey | "market", Recommendation> = 
     ],
   },
   inventoryFulfillment: {
-    action: "Protect minimum stock for highest-velocity models and rebalance away from slow movers",
-    why: "Availability and delivery are the biggest operational constraints: 11% stock-out and 4.8-day lead time vs. 2.4 days at top stores.",
-    topPeer: "Top peers combine higher availability with faster turns, protecting hero SKUs while pruning slow movers.",
+    action: "Protect Availability of Highest-Demand Models",
+    why: "High-demand models drive a disproportionate share of traffic and sales when they are available.",
+    topPeer: "Leading stores maintain 95%+ in-stock rates on key models and average 2–3 day delivery lead times.",
     competitor:
-      "Mattress Firm publishes delivery tracking so shoppers can see fulfillment progress. Tempur-Pedic flagship experience includes white-glove setup.",
+      "Leading mattress retailers make delivery and fulfillment part of the customer promise, including delivery visibility and white-glove service.",
     whatToDo:
-      "Set a never-out list for the top 8 velocity models, cut two slow movers occupying display slots, and quote a reliable delivery window at close.",
+      "Prioritize inventory for top demand models. Set in-stock alerts and replenishment rules. Improve delivery scheduling and visibility. Track and review stock-outs weekly.",
     priority: "High",
     sources: [
-      { label: "Inventory Snapshot", kind: "store" },
-      { label: "Delivery Log", kind: "store" },
-      { label: "Top Peers", kind: "peer" },
-      COMPETITOR_SOURCES[2],
+      { label: "Inventory", kind: "store" },
+      { label: "Orders", kind: "store" },
+      { label: "POS", kind: "store" },
+      { label: "Delivery", kind: "store" },
     ],
   },
   market: {
-    action: "Win cooling and value demand in a growing suburban household base",
+    action: "Expand cooling in the $1,500–$2,500 band to capture unmet local demand",
     why: "Local demand for Cooling, Pressure Relief and Value is high, while current estimated share is only 8.7% of a $21.4M illustrative opportunity.",
     topPeer: "Comparable top stores convert more of the same suburban replacement and new-household demand by matching assortment and consultative selling to those needs.",
     competitor:
