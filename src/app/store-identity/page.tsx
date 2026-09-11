@@ -1,4 +1,6 @@
 import { AppShell, PageHeader } from "@/components/app-shell";
+import { IconTile } from "@/components/icon-tile";
+import { StorefrontGlyph } from "@/components/peer-rank-strip";
 import { getStore, storeRank } from "@/lib/selectors";
 import {
   ArrowRight,
@@ -31,14 +33,14 @@ export default async function StoreIdentityPage({
   const q = `?store=${store.id}`;
 
   const physical = [
-    { icon: <Building2 className="h-4 w-4" />, label: "Store Type", value: id.storeType },
-    { icon: <MapPin className="h-4 w-4" />, label: "Trade Area", value: id.tradeArea },
-    { icon: <Home className="h-4 w-4" />, label: "Total Selling Space", value: `${id.sellingSpaceSqFt.toLocaleString("en-US")} sq. ft.` },
-    { icon: <BedDouble className="h-4 w-4" />, label: "Mattress Selling Space", value: `${id.mattressSellingSpaceSqFt.toLocaleString("en-US")} sq. ft.` },
-    { icon: <LayoutGrid className="h-4 w-4" />, label: "Display Slots", value: `${id.displaySlots}` },
-    { icon: <Tag className="h-4 w-4" />, label: "Price Position", value: id.pricePosition },
-    { icon: <Package className="h-4 w-4" />, label: "Brands Carried", value: `${id.brands.length}` },
-    { icon: <Store className="h-4 w-4" />, label: "SSB Models", value: `${id.ssbModels}` },
+    { icon: <Building2 className="h-5 w-5" />, label: "Store Type", value: id.storeType },
+    { icon: <MapPin className="h-5 w-5" />, label: "Trade Area", value: id.tradeArea },
+    { icon: <Home className="h-5 w-5" />, label: "Total Selling Space", value: `${id.sellingSpaceSqFt.toLocaleString("en-US")} sq. ft.` },
+    { icon: <BedDouble className="h-5 w-5" />, label: "Mattress Selling Space", value: `${id.mattressSellingSpaceSqFt.toLocaleString("en-US")} sq. ft.` },
+    { icon: <LayoutGrid className="h-5 w-5" />, label: "Display Slots", value: `${id.displaySlots}` },
+    { icon: <Tag className="h-5 w-5" />, label: "Price Position", value: id.pricePosition },
+    { icon: <Package className="h-5 w-5" />, label: "Brands Carried", value: `${id.brands.length}` },
+    { icon: <Store className="h-5 w-5" />, label: "SSB Models", value: `${id.ssbModels}` },
   ];
 
   return (
@@ -49,114 +51,125 @@ export default async function StoreIdentityPage({
           subtitle="View key details about this store, including its physical characteristics, team, and profile attributes."
         />
 
-        <div className="mb-3 grid shrink-0 grid-cols-4 gap-3">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                <Home className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-ssb-navy">
-                  {store.name} – {store.city}, {store.state}
-                </p>
-                <p className="text-[11px] text-slate-400">Suburban Growth – Mid-Size Full-Line Retailer</p>
-              </div>
+        {/* single strip card with internal dividers */}
+        <div className="mb-3 flex shrink-0 items-stretch gap-6 rounded-[18px] border border-slate-200 bg-white px-6 py-4">
+          <div className="flex items-center gap-3.5">
+            <IconTile tone="slate" size="xl" shape="circle">
+              <StorefrontGlyph className="h-7 w-7" />
+            </IconTile>
+            <div>
+              <p className="text-[19px] font-semibold text-ssb-navy">
+                {store.name} – {store.city}, {store.state}
+              </p>
+              <p className="mt-0.5 text-[13px] text-slate-500">Suburban Growth – Mid-Size Full-Line Retailer</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-[#e8f2ff] px-4 py-3">
-            <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <BarChart3 className="h-3.5 w-3.5 text-ssb-blue" />
-              Overall Store Effectiveness Score
-            </p>
-            <p className="mt-1 text-3xl font-semibold text-ssb-navy">
-              {store.overallScore} <span className="text-base font-medium text-slate-400">/ 100</span>
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-            <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <Users className="h-3.5 w-3.5 text-ssb-blue" />
-              Peer Rank
-            </p>
-            <p className="mt-1 text-3xl font-semibold text-ssb-navy">
-              #{rank.rank} <span className="text-base font-medium text-slate-400">of {rank.of}</span>
-            </p>
-            <p className="text-[11px] text-slate-400">Top {rank.percentile}% of Comparable Stores</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-[#eaf3ff] px-4 py-3">
-            <div className="flex gap-2">
-              <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-ssb-blue" />
-              <p className="text-[12px] leading-snug text-ssb-navy">
-                This store profile summarizes the key characteristics used to determine its peer cluster and
-                opportunity areas.
+          <div className="flex items-center gap-3.5 border-l border-slate-200 pl-6">
+            <IconTile tone="blue" size="lg">
+              <BarChart3 className="h-6 w-6" />
+            </IconTile>
+            <div>
+              <p className="text-[13px] text-slate-500">Overall Store Effectiveness Score</p>
+              <p className="mt-0.5 text-[30px] font-bold leading-none text-ssb-blue">
+                {store.overallScore} <span className="text-[16px] font-semibold text-ssb-navy">/ 100</span>
               </p>
             </div>
+          </div>
+          <div className="flex items-center gap-3.5 border-l border-slate-200 pl-6">
+            <IconTile tone="blue" size="lg">
+              <Users className="h-6 w-6" />
+            </IconTile>
+            <div>
+              <p className="text-[13px] text-slate-500">Peer Rank</p>
+              <p className="mt-0.5 text-[30px] font-bold leading-none text-ssb-blue">
+                #{rank.rank} <span className="text-[16px] font-semibold text-ssb-navy">of {rank.of}</span>
+              </p>
+              <p className="mt-1 text-[12px] text-slate-400">Top {rank.percentile}% of Comparable Stores</p>
+            </div>
+          </div>
+          <div className="ml-auto flex max-w-[330px] items-start gap-3 self-center rounded-[14px] bg-[#eaf3ff] px-4 py-3">
+            <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-ssb-blue" />
+            <p className="text-[13px] leading-snug text-ssb-navy">
+              This store profile summarizes the key characteristics used to determine its peer cluster and opportunity
+              areas.
+            </p>
           </div>
         </div>
 
         <div className="grid min-h-0 flex-1 grid-cols-2 gap-3">
-          <section className="flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="mb-2 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ssb-blue-soft text-ssb-blue">
-                <Building2 className="h-4 w-4" />
-              </div>
+          <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-5">
+            <div className="mb-2 flex items-center gap-3">
+              <IconTile tone="blue" size="md">
+                <Building2 className="h-5 w-5" />
+              </IconTile>
               <div>
-                <h3 className="text-sm font-semibold text-ssb-navy">Physical & Commercial</h3>
-                <p className="text-[11px] text-slate-400">Key physical and commercial attributes for this store.</p>
+                <h3 className="text-[17px] font-semibold text-ssb-navy">Physical &amp; Commercial</h3>
+                <p className="text-[12.5px] text-slate-500">Key physical and commercial attributes for this store.</p>
               </div>
             </div>
-            <dl className="min-h-0 flex-1">
+            <dl className="flex min-h-0 flex-1 flex-col">
               {physical.map((row) => (
                 <div
                   key={row.label}
-                  className="flex items-center justify-between gap-3 border-b border-slate-100 py-2.5 last:border-0"
+                  className="grid flex-1 grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-center border-b border-slate-100 last:border-0"
                 >
-                  <dt className="flex items-center gap-2 text-[13px] text-slate-500">
+                  <dt className="flex items-center gap-3 text-[14px] text-slate-500">
                     <span className="text-ssb-blue">{row.icon}</span>
                     {row.label}
                   </dt>
-                  <dd className="text-[13px] font-semibold text-ssb-navy">{row.value}</dd>
+                  <dd className="text-[14.5px] font-semibold text-ssb-navy">{row.value}</dd>
                 </div>
               ))}
             </dl>
           </section>
 
-          <section className="flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ssb-blue-soft text-ssb-blue">
-                  <Users className="h-4 w-4" />
-                </div>
+          <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-5">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <IconTile tone="blue" size="md">
+                  <Users className="h-5 w-5" />
+                </IconTile>
                 <div>
-                  <h3 className="text-sm font-semibold text-ssb-navy">People & Team</h3>
-                  <p className="text-[11px] text-slate-400">Sales team composition and training completion.</p>
+                  <h3 className="text-[17px] font-semibold text-ssb-navy">People &amp; Team</h3>
+                  <p className="text-[12.5px] text-slate-500">Sales team composition and training completion.</p>
                 </div>
               </div>
-              <div className="rounded-xl bg-[#eaf3ff] px-3 py-1.5 text-center">
-                <p className="text-[10px] text-slate-500">Sales Associates</p>
-                <p className="text-lg font-semibold leading-none text-ssb-navy">{id.associates.length}</p>
+              <div className="flex items-center gap-3 rounded-[14px] bg-[#eaf3ff] px-4 py-2.5">
+                <IconTile tone="blue" size="sm">
+                  <Users className="h-4 w-4" />
+                </IconTile>
+                <div>
+                  <p className="text-[12px] text-slate-500">Sales Associates</p>
+                  <p className="text-[22px] font-bold leading-none text-ssb-navy">{id.associates.length}</p>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-[1.2fr_1fr_0.7fr] px-1 pb-1 text-[10px] uppercase tracking-wide text-slate-400">
+            <div className="grid grid-cols-[1.15fr_1.35fr_0.6fr] border-b border-slate-200 pb-2 text-[12.5px] font-medium text-slate-500">
               <span>Associate Name</span>
               <span>Training Completion</span>
               <span className="text-right">Tenure</span>
             </div>
-            <ul className="min-h-0 flex-1 space-y-2">
+            <ul className="flex min-h-0 flex-1 flex-col">
               {id.associates.map((person) => (
-                <li key={person.name} className="grid grid-cols-[1.2fr_1fr_0.7fr] items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-ssb-navy">
+                <li
+                  key={person.name}
+                  className="grid flex-1 grid-cols-[1.15fr_1.35fr_0.6fr] items-center gap-3 border-b border-slate-100 last:border-0"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#dbeafe] text-[12px] font-bold text-[#1d4ed8]">
                       {person.initials}
                     </span>
-                    <span className="text-[13px] font-medium text-ssb-navy">{person.name}</span>
+                    <span className="text-[14.5px] font-semibold text-ssb-navy">{person.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                      <div className="h-2 rounded-full bg-ssb-blue" style={{ width: `${person.trainingPct}%` }} />
+                  <div className="flex items-center gap-3">
+                    <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-3 rounded-full bg-ssb-blue" style={{ width: `${person.trainingPct}%` }} />
                     </div>
-                    <span className="w-8 text-right text-[11px] tabular-nums text-slate-500">{person.trainingPct}%</span>
+                    <span className="w-9 text-right text-[13px] font-semibold tabular-nums text-slate-600">
+                      {person.trainingPct}%
+                    </span>
                   </div>
-                  <span className="text-right text-[12px] tabular-nums text-slate-500">
+                  <span className="text-right text-[13.5px] tabular-nums text-slate-600">
                     {person.tenureYears.toFixed(1)} years
                   </span>
                 </li>
@@ -165,23 +178,27 @@ export default async function StoreIdentityPage({
           </section>
         </div>
 
-        <div className="mt-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-2.5">
-          <p className="max-w-[520px] flex items-center gap-2 text-[12px] text-slate-500">
-            <Database className="h-4 w-4 text-ssb-blue" />
-            These store characteristics are used to determine the peer cluster and contextualize recommendations
-            across the Retailer Relationship Improvement Engine.
-          </p>
+        <div className="mt-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-[18px] border border-slate-200 bg-white px-5 py-3">
+          <div className="flex max-w-[560px] items-center gap-3 text-[13px] text-slate-500">
+            <IconTile tone="blue" size="sm">
+              <Database className="h-4 w-4" />
+            </IconTile>
+            <p>
+              These store characteristics are used to determine the peer cluster and contextualize recommendations
+              across the Retailer Relationship Improvement Engine.
+            </p>
+          </div>
           <div className="flex shrink-0 items-center gap-3">
-            <span className="text-[11px] text-slate-400">Data sources:</span>
-            <SourceChip icon={<Database className="h-3 w-3" />} label="Retailer Master" />
-            <SourceChip icon={<FileText className="h-3 w-3" />} label="Store Survey" />
-            <SourceChip icon={<Package className="h-3 w-3" />} label="Product Master" />
+            <span className="text-[12.5px] text-slate-500">Data sources:</span>
+            <SourceChip icon={<Database className="h-3.5 w-3.5" />} label="Retailer Master" />
+            <SourceChip icon={<FileText className="h-3.5 w-3.5" />} label="Store Survey" />
+            <SourceChip icon={<Package className="h-3.5 w-3.5" />} label="Product Master" />
             <Link
               href={`/peer-comparison${q}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-ssb-blue px-3 py-1.5 text-[12px] font-medium text-ssb-blue hover:bg-ssb-blue-soft"
+              className="inline-flex items-center gap-2 rounded-[12px] border border-ssb-blue px-4 py-2 text-[13.5px] font-medium text-ssb-blue hover:bg-ssb-blue-soft"
             >
               View cluster context
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -192,8 +209,8 @@ export default async function StoreIdentityPage({
 
 function SourceChip({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-600">
-      {icon}
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-[#f4f8fd] px-3 py-1.5 text-[12.5px] font-medium text-slate-600">
+      <span className="text-ssb-blue">{icon}</span>
       {label}
     </span>
   );

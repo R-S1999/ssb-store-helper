@@ -9,8 +9,8 @@ import type { StoreRecord } from "@/lib/types";
 
 const NAV = [
   { n: "01", label: "Peer Comparison", href: "/peer-comparison", id: "peer" },
-  { n: "02", label: "Opportunity Areas", href: "/store-performance", id: "opp" },
-  { n: "03", label: "Action Plan", href: "/market-opportunity", id: "plan" },
+  { n: "02", label: "Store Performance", href: "/store-performance", id: "opp" },
+  { n: "03", label: "Store & Market Opportunity", href: "/market-opportunity", id: "plan" },
 ];
 
 function activeId(pathname: string) {
@@ -67,8 +67,8 @@ export function AppShell({
           </div>
         </div>
       </header>
-      <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col px-6 pt-2.5 pb-3">
-        <nav className="mb-1.5 flex shrink-0 flex-wrap items-center gap-x-1 text-[13px]">
+      <div className="mx-auto flex min-h-0 w-full max-w-[1440px] flex-1 flex-col px-6 pt-3 pb-4">
+        <nav className="mb-2 flex shrink-0 flex-wrap items-center gap-x-1 text-[13.5px]">
           {NAV.map((item, i) => (
             <span key={item.href} className="flex items-center gap-1">
               {i > 0 ? <span className="px-1 text-slate-300">›</span> : null}
@@ -102,9 +102,9 @@ export function PageHeader({
   question?: string;
 }) {
   return (
-    <div className="mb-2 shrink-0">
-      <h2 className="text-[26px] font-semibold leading-tight tracking-tight text-ssb-navy">{title}</h2>
-      <p className="mt-0.5 text-[13px] text-slate-500">{subtitle}</p>
+    <div className="mb-2.5 shrink-0">
+      <h2 className="text-[30px] font-semibold leading-tight tracking-tight text-ssb-navy">{title}</h2>
+      <p className="mt-1 text-[14px] text-slate-500">{subtitle}</p>
     </div>
   );
 }

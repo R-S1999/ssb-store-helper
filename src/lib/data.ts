@@ -871,7 +871,7 @@ export const RECOMMENDATIONS: Record<AttributeKey | "market", Recommendation> = 
     competitor:
       "Leading mattress retailers use showroom space to clearly differentiate sleep benefits and encourage guided in-store trial.",
     whatToDo:
-      "Replace with a differentiated cooling mattress. Add clear benefit messaging. Enable associate guided trial.",
+      "Replace with a differentiated cooling model. Add clear benefit messaging. Enable guided in-store trial.",
     priority: "High",
     sources: [
       { label: "Display Productivity", kind: "store" },

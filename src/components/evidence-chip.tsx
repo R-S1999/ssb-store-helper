@@ -16,7 +16,7 @@ export function EvidenceChip({
   className?: string;
 }) {
   const classes = cn(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide",
+    "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 py-1 text-[11px] font-medium",
     kindClass[source.kind],
     className,
   );

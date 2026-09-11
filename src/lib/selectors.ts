@@ -49,7 +49,7 @@ export function displayName(store: StoreRecord, asPeer = false) {
 }
 
 export function attributeStatus(store: number, cluster: number, top: number): StatusTone {
-  if (store >= top - 4) return "strong";
+  if (store >= top - 7) return "strong";
   if (store >= cluster) return "above";
   if (store >= cluster - 6) return "opportunity";
   return "attention";

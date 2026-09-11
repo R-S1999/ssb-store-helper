@@ -10,16 +10,18 @@ import {
   storeRank,
 } from "@/lib/selectors";
 import type { AttributeKey } from "@/lib/types";
-import { ArrowRight, BarChart3, Boxes, Home, Lightbulb, Tag, Target, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ArrowRight, BarChart3, Boxes, LayoutGrid, Lightbulb, Tag, Target, Users, UsersRound } from "lucide-react";
+import { StorefrontGlyph } from "@/components/peer-rank-strip";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 const ICONS: Record<AttributeKey, { node: ReactNode; className: string }> = {
-  salesAssociate: { node: <Users className="h-5 w-5" />, className: "bg-[#e8f1ff] text-ssb-blue" },
-  customerAlignment: { node: <Users className="h-5 w-5" />, className: "bg-emerald-50 text-emerald-600" },
-  displayAssortment: { node: <Home className="h-5 w-5" />, className: "bg-slate-100 text-slate-500" },
-  pricingPromotion: { node: <Tag className="h-5 w-5" />, className: "bg-violet-50 text-violet-600" },
-  inventoryFulfillment: { node: <Boxes className="h-5 w-5" />, className: "bg-sky-50 text-sky-600" },
+  salesAssociate: { node: <Users className="h-5 w-5" />, className: "bg-[#dbeafe] text-[#1d4ed8]" },
+  customerAlignment: { node: <UsersRound className="h-5 w-5" />, className: "bg-[#d1fae5] text-[#047857]" },
+  displayAssortment: { node: <LayoutGrid className="h-5 w-5" />, className: "bg-[#e2e8f0] text-[#475569]" },
+  pricingPromotion: { node: <Tag className="h-5 w-5" />, className: "bg-[#ede9fe] text-[#6d28d9]" },
+  inventoryFulfillment: { node: <Boxes className="h-5 w-5" />, className: "bg-[#e0f2fe] text-[#0369a1]" },
 };
 
 export default async function StorePerformancePage({
@@ -44,49 +46,57 @@ export default async function StorePerformancePage({
           title="Store Performance Profile"
           subtitle="See how your current store attributes compare with top stores in your cluster."
         />
-        <div className="mb-2.5 grid shrink-0 grid-cols-4 gap-2.5">
+        <div className="mb-3 grid shrink-0 grid-cols-[1.15fr_0.85fr_0.9fr_1.35fr] gap-3">
           <SummaryCard>
-            <div className="flex items-center gap-3">
-              <IconTile tone="slate">
-                <Home className="h-5 w-5" />
+            <div className="flex items-center gap-3.5">
+              <IconTile tone="slate" size="lg">
+                <StorefrontGlyph className="h-6 w-6" />
               </IconTile>
-              <div>
-                <p className="text-[11px] text-slate-500">Current Store</p>
-                <p className="text-sm font-semibold text-ssb-navy">
+              <div className="min-w-0">
+                <p className="text-[12.5px] text-slate-500">Current Store</p>
+                <p className="truncate text-[16px] font-semibold text-ssb-navy">
                   {store.name} – {store.city}, {store.state}
                 </p>
-                <p className="text-[11px] text-slate-400">{CLUSTER.name}</p>
+                <p className="truncate text-[12px] text-slate-400">{CLUSTER.name}</p>
               </div>
             </div>
           </SummaryCard>
           <SummaryCard>
-            <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <BarChart3 className="h-3.5 w-3.5 text-ssb-blue" />
-              Overall Store Effectiveness Score
-            </p>
-            <p className="mt-1 text-[28px] font-semibold leading-none text-ssb-navy">
-              {store.overallScore} <span className="text-base font-medium text-slate-400">/ 100</span>
-            </p>
+            <div className="flex items-center gap-3.5">
+              <IconTile tone="blue" size="lg">
+                <BarChart3 className="h-6 w-6" />
+              </IconTile>
+              <div>
+                <p className="text-[12.5px] text-slate-500">Overall Store Effectiveness Score</p>
+                <p className="mt-0.5 text-[32px] font-bold leading-none text-ssb-blue">
+                  {store.overallScore} <span className="text-[17px] font-semibold text-ssb-navy">/ 100</span>
+                </p>
+              </div>
+            </div>
           </SummaryCard>
           <SummaryCard>
-            <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <Users className="h-3.5 w-3.5 text-ssb-blue" />
-              Peer Rank
-            </p>
-            <p className="mt-1 text-[28px] font-semibold leading-none text-ssb-navy">
-              #{rank.rank} <span className="text-base font-medium text-slate-400">of {rank.of}</span>
-            </p>
-            <p className="mt-1 text-[11px] text-slate-400">Top {rank.percentile}% of Comparable Stores</p>
+            <div className="flex items-center gap-3.5">
+              <IconTile tone="blue" size="lg">
+                <Users className="h-6 w-6" />
+              </IconTile>
+              <div>
+                <p className="text-[12.5px] text-slate-500">Peer Rank</p>
+                <p className="mt-0.5 text-[32px] font-bold leading-none text-ssb-blue">
+                  #{rank.rank} <span className="text-[17px] font-semibold text-ssb-navy">of {rank.of}</span>
+                </p>
+                <p className="mt-1 text-[12px] text-slate-400">Top {rank.percentile}% of Comparable Stores</p>
+              </div>
+            </div>
           </SummaryCard>
-          <SummaryCard>
-            <div className="flex gap-2">
-              <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-ssb-blue" />
-              <p className="text-[12px] leading-snug text-ssb-navy">{insightStrip(store)}</p>
+          <SummaryCard tone="blue">
+            <div className="flex gap-3">
+              <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-ssb-blue" />
+              <p className="text-[13px] leading-snug text-ssb-navy">{insightStrip(store)}</p>
             </div>
           </SummaryCard>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
           {keys.map((key) => {
             const tone = attributeStatus(
               store.attributes[key],
@@ -111,20 +121,20 @@ export default async function StorePerformancePage({
           })}
         </div>
 
-        <div className="mt-2.5 flex shrink-0 items-center justify-between gap-3 rounded-[16px] bg-[#eaf3ff] px-4 py-2.5">
-          <p className="flex items-center gap-2 text-[13px] text-ssb-navy">
-            <IconTile tone="blue" size="sm">
-              <Target className="h-3.5 w-3.5" />
+        <div className="mt-3 flex shrink-0 items-center justify-between gap-4 rounded-[16px] border border-slate-200 bg-white px-5 py-3.5">
+          <div className="flex items-center gap-3 text-[14px] text-ssb-navy">
+            <IconTile tone="blue" size="md">
+              <Target className="h-5 w-5" />
             </IconTile>
             <span>
               <span className="font-semibold">Biggest opportunity:</span> improving{" "}
               {weak.map((k) => ATTRIBUTE_META[k].label).join(" and ") || "remaining gaps versus top stores"} could
               close the largest gap to top stores.
             </span>
-          </p>
+          </div>
           <Link
             href={`${ATTRIBUTE_META[firstGap].href}?store=${store.id}`}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-ssb-blue/40 bg-white px-4 py-2 text-[13px] font-medium text-ssb-blue hover:bg-white/80"
+            className="inline-flex shrink-0 items-center gap-2 rounded-[12px] border border-ssb-blue/40 bg-white px-5 py-2.5 text-[14px] font-medium text-ssb-blue hover:bg-ssb-blue-soft"
           >
             View attribute details
             <ArrowRight className="h-4 w-4" />
@@ -135,6 +145,15 @@ export default async function StorePerformancePage({
   );
 }
 
-function SummaryCard({ children }: { children: ReactNode }) {
-  return <div className="rounded-[16px] border border-slate-200 bg-white px-4 py-3">{children}</div>;
+function SummaryCard({ children, tone }: { children: ReactNode; tone?: "blue" }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center rounded-[16px] border border-slate-200 px-5 py-4",
+        tone === "blue" ? "bg-[#eaf3ff]" : "bg-white",
+      )}
+    >
+      {children}
+    </div>
+  );
 }

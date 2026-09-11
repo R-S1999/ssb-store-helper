@@ -11,20 +11,20 @@ type FloorTone = "productive" | "expected" | "below" | "underproductive";
 
 const BEDS: { n: number; tone: FloorTone }[] = [
   { n: 1, tone: "productive" },
-  { n: 2, tone: "productive" },
-  { n: 3, tone: "expected" },
+  { n: 2, tone: "expected" },
+  { n: 3, tone: "productive" },
   { n: 4, tone: "below" },
-  { n: 5, tone: "productive" },
-  { n: 6, tone: "below" },
-  { n: 7, tone: "productive" },
-  { n: 8, tone: "productive" },
-  { n: 9, tone: "productive" },
+  { n: 5, tone: "expected" },
+  { n: 6, tone: "expected" },
+  { n: 7, tone: "expected" },
+  { n: 8, tone: "expected" },
+  { n: 9, tone: "below" },
   { n: 10, tone: "productive" },
-  { n: 11, tone: "below" },
-  { n: 12, tone: "productive" },
+  { n: 11, tone: "underproductive" },
+  { n: 12, tone: "expected" },
   { n: 13, tone: "productive" },
   { n: 14, tone: "underproductive" },
-  { n: 15, tone: "productive" },
+  { n: 15, tone: "expected" },
 ];
 
 const TONE: Record<FloorTone, { mattress: string; pillow: string; label: string; hint: string }> = {
@@ -40,99 +40,56 @@ export function ShowroomFloor() {
   const bed = BEDS.find((b) => b.n === selected)!;
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[1.12fr_0.88fr] gap-3">
-      <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-3.5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-[14px] font-semibold text-ssb-navy">Display Slot Map</p>
-            <p className="text-[11px] text-slate-400">15 display slots · Mattress World – Plano, TX</p>
+    <div className="grid min-h-0 flex-1 grid-cols-[1.05fr_0.95fr] gap-4">
+      <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="shrink-0 whitespace-nowrap">
+            <p className="text-[17px] font-semibold text-ssb-navy">Display Slot Map</p>
+            <p className="mt-0.5 text-[12.5px] text-slate-500">15 display slots · Mattress World – Plano, TX</p>
           </div>
-          <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-[10px] text-slate-500">
+          <div className="flex min-w-0 flex-wrap justify-end gap-x-3 gap-y-1 text-[9.5px] whitespace-nowrap">
             {(Object.keys(TONE) as FloorTone[]).map((tone) => (
-              <span key={tone} className="flex items-center gap-1.5">
-                <i className="h-2 w-2 rounded-[2px]" style={{ background: TONE[tone].mattress }} />
-                <span className="font-medium text-ssb-navy">{TONE[tone].label}</span>
+              <span key={tone} className="flex items-center gap-1">
+                <i className="h-2 w-2 rounded-full" style={{ background: TONE[tone].mattress }} />
+                <span className="font-semibold text-ssb-navy">{TONE[tone].label}</span>
                 <span className="text-slate-400">{TONE[tone].hint}</span>
               </span>
             ))}
           </div>
         </div>
 
-        <div className="relative mt-2 min-h-0 flex-1 rounded-[14px] border border-slate-200 bg-[#f4f7fa]">
-          <div className="absolute inset-2 grid grid-cols-[70px_minmax(0,1fr)_78px] gap-2">
-            <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white">
-              <div className="mb-2 h-8 w-14 rounded-sm bg-slate-200" />
-              <div className="h-3 w-10 rounded-sm bg-slate-300" />
-              <p className="mt-3 text-center text-[9px] font-semibold uppercase tracking-wide text-slate-400">
-                Customer
-                <br />
-                Service
-              </p>
-            </div>
-            <div className="grid grid-cols-5 content-center gap-x-3 gap-y-4 px-2">
-              {BEDS.map((b) => (
-                <button
-                  key={b.n}
-                  type="button"
-                  onClick={() => setSelected(b.n)}
-                  className="relative flex flex-col items-center"
-                >
-                  <BedSlot tone={b.tone} active={selected === b.n} />
-                  <span className="mt-1 text-[11px] font-semibold text-ssb-navy">{b.n}</span>
-                  {b.n === 14 ? (
-                    <span className="absolute -bottom-1 rounded-full bg-ssb-blue px-1.5 text-[8px] font-bold tracking-wide text-white">
-                      YOU
-                    </span>
-                  ) : null}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-col justify-between py-3">
-              <Plant />
-              <div className="space-y-1.5">
-                <div className="h-10 rounded-md bg-slate-300/80" />
-                <div className="h-10 rounded-md bg-slate-300/70" />
-              </div>
-              <Plant />
-            </div>
-          </div>
-          <div className="absolute bottom-1 left-1/2 flex -translate-x-1/2 flex-col items-center">
-            <span className="text-[10px] text-slate-400">↑</span>
-            <span className="rounded-md border border-slate-200 bg-white px-3 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
-              Entrance
-            </span>
-          </div>
-        </div>
+        <FloorPlan selected={selected} onSelect={setSelected} />
       </section>
 
-      <div className="flex min-h-0 flex-col gap-2.5">
-        <section className="rounded-[18px] border border-slate-200 bg-white p-3.5">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <IconTile tone="blue" size="sm">
-                <BedDouble className="h-3.5 w-3.5" />
+      <div className="flex min-h-0 flex-col gap-4">
+        <section className="shrink-0 rounded-[18px] border border-slate-200 bg-white p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <IconTile tone="blue" size="md">
+                <BedDouble className="h-5 w-5" />
               </IconTile>
               <div>
-                <p className="text-[11px] font-semibold text-slate-400">Display {selected}</p>
-                <h3 className="text-[16px] font-semibold leading-tight text-ssb-navy">
+                <p className="text-[17px] font-semibold leading-tight text-ssb-navy">Display {selected}</p>
+                <p className="text-[15px] leading-tight text-slate-600">
                   {selected === 14 ? "Beautyrest Premium Hybrid" : `Floor model ${selected}`}
-                </h3>
+                </p>
               </div>
             </div>
-            <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-ssb-red">
-              {TONE[bed.tone].label === "Underproductive" ? "Underproductive" : TONE[bed.tone].label}
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#fee2e2] px-3 py-1.5 text-[12.5px] font-semibold text-[#b91c1c]">
+              <span className="h-2 w-2 rounded-full bg-[#dc2626]" />
+              {TONE[bed.tone].label}
             </span>
           </div>
-          <div className="mt-3 grid grid-cols-6 gap-2 text-center">
-            <Metric label="Monthly Revenue" value="$9.8K" />
+          <div className="mt-3 grid grid-cols-6">
+            <Metric label="Monthly Revenue" value="$9.8K" first />
             <Metric label="Top Peer Median" value="$14.1K" />
             <Metric label="Revenue Percentile" value="31st" />
             <Metric label="Days on Display" value="212" />
             <Metric label="Trial Rate" value="Low" />
             <Metric label="Customer Need" value="Premium Comfort" />
           </div>
-          <div className="mt-2.5 flex items-start gap-2 rounded-xl bg-rose-50 px-3 py-2 text-[12px] text-ssb-red">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <div className="mt-3 flex items-start gap-2.5 rounded-[14px] bg-[#fef2f2] px-4 py-2.5 text-[13px] leading-snug text-[#b91c1c]">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
               <span className="font-semibold">This display is underperforming</span> while Cooling demand is
               under-covered in your assortment.
@@ -140,6 +97,7 @@ export function ShowroomFloor() {
           </div>
         </section>
         <ActionQuad
+          accent
           recommendation={rec}
           intro="Leading mattress retailers use showroom space to clearly differentiate sleep benefits and encourage guided in-store trial."
           sourceLabel="Supporting evidence:"
@@ -150,36 +108,111 @@ export function ShowroomFloor() {
   );
 }
 
-function BedSlot({ tone, active }: { tone: FloorTone; active: boolean }) {
-  const t = TONE[tone];
+function FloorPlan({ selected, onSelect }: { selected: number; onSelect: (n: number) => void }) {
   return (
-    <span
-      className={cn(
-        "relative block h-[52px] w-[38px] rounded-[4px] shadow-sm",
-        active && "ring-2 ring-ssb-blue ring-offset-2",
-      )}
-      style={{ background: t.mattress }}
-    >
-      <span className="absolute top-0.5 right-1 left-1 h-2 rounded-sm" style={{ background: t.pillow }} />
-    </span>
+    <div className="relative mt-4 min-h-0 flex-1">
+      <div className="absolute inset-0 rounded-[10px] border-[7px] border-[#8f9bab] bg-[#fbfcfd]">
+        {/* left wall: customer service desk */}
+        <div className="absolute top-[22%] bottom-[24%] left-0 flex w-[74px] flex-col items-center justify-center gap-2 px-1.5">
+          <div className="h-[46%] w-[26px] rounded-[3px] bg-[#d8cfc2]" />
+          <div className="h-[15px] w-[22px] rounded-[5px] bg-[#5b6675]" />
+          <p className="mt-1 text-center text-[8.5px] font-semibold uppercase tracking-wide text-slate-500">
+            Customer
+            <br />
+            Service
+          </p>
+        </div>
+
+        {/* right wall: shelving unit */}
+        <div className="absolute top-[26%] right-[10px] flex h-[34%] w-[30px] flex-col justify-evenly rounded-[4px] border border-[#c3ccd7] bg-[#e8edf3] px-[3px]">
+          <i className="h-[2px] w-full bg-[#c3ccd7]" />
+          <i className="h-[2px] w-full bg-[#c3ccd7]" />
+          <i className="h-[2px] w-full bg-[#c3ccd7]" />
+        </div>
+
+        {/* greenery along the walls */}
+        <Plant className="absolute top-[4%] left-[12px] h-8 w-8" />
+        <Plant className="absolute top-[8%] right-[16px] h-9 w-9" />
+        <Plant className="absolute top-[45%] right-[52px] h-8 w-8" />
+        <Plant className="absolute bottom-[8%] right-[18px] h-9 w-9" />
+        <Plant className="absolute bottom-[6%] left-[14px] h-8 w-8" />
+
+        {/* bed grid */}
+        <div className="absolute inset-y-[7%] right-[54px] left-[84px] grid grid-cols-5 grid-rows-3 gap-x-3 gap-y-2">
+          {BEDS.map((b) => (
+            <BedCard key={b.n} n={b.n} tone={b.tone} active={selected === b.n} onSelect={onSelect} />
+          ))}
+        </div>
+
+        {/* entrance doorway cut into the bottom wall */}
+        <div className="absolute bottom-[-7px] left-1/2 h-[7px] w-[92px] -translate-x-1/2 bg-[#fbfcfd]" />
+      </div>
+      <div className="absolute bottom-[-4px] left-1/2 flex -translate-x-1/2 flex-col items-center">
+        <span className="text-[11px] leading-none text-slate-400">↑</span>
+        <span className="text-[9.5px] font-semibold uppercase tracking-wide text-slate-500">Entrance</span>
+      </div>
+    </div>
   );
 }
 
-function Plant() {
+function BedCard({
+  n,
+  tone,
+  active,
+  onSelect,
+}: {
+  n: number;
+  tone: FloorTone;
+  active: boolean;
+  onSelect: (n: number) => void;
+}) {
+  const t = TONE[tone];
   return (
-    <svg viewBox="0 0 40 40" className="mx-auto h-10 w-10 text-emerald-400" aria-hidden>
-      <ellipse cx="20" cy="32" rx="10" ry="4" fill="#cbd5e1" />
-      <path d="M20 30 C12 18 18 8 20 6 C22 8 28 18 20 30Z" fill="currentColor" />
-      <path d="M20 28 C24 20 32 18 34 12" stroke="currentColor" strokeWidth="2" fill="none" />
+    <button
+      type="button"
+      onClick={() => onSelect(n)}
+      className={cn(
+        "relative flex flex-col items-center justify-center gap-1 rounded-[7px] bg-[#f1f5f9] px-1 py-1.5",
+        active && "bg-white ring-2 ring-ssb-blue",
+      )}
+    >
+      {/* mattress seen from above: pillow strip along the top edge */}
+      <span
+        className="relative block h-[62%] w-[74%] min-h-[20px] rounded-[3px]"
+        style={{ background: t.mattress }}
+      >
+        <span
+          className="absolute top-[3px] right-[4px] left-[4px] h-[26%] min-h-[4px] rounded-[2px]"
+          style={{ background: t.pillow }}
+        />
+      </span>
+      <span className="text-[11px] font-semibold leading-none text-ssb-navy">{n}</span>
+      {active ? (
+        <span className="absolute -bottom-[11px] left-1/2 -translate-x-1/2 rounded-[4px] bg-ssb-blue px-2 py-[2px] text-[9px] font-bold leading-none tracking-wide text-white">
+          YOU
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
+function Plant({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 44" className={className} aria-hidden>
+      <circle cx="20" cy="14" r="8.5" fill="#2f7d54" />
+      <circle cx="12" cy="19" r="7" fill="#3f9c6b" />
+      <circle cx="28" cy="19" r="7" fill="#3f9c6b" />
+      <circle cx="20" cy="23" r="7.5" fill="#256b46" />
+      <path d="M14 29h12l-1.8 10h-8.4z" fill="#c3ccd7" />
     </svg>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value, first = false }: { label: string; value: string; first?: boolean }) {
   return (
-    <div>
-      <p className="text-[9px] leading-tight text-slate-400">{label}</p>
-      <p className="text-[12px] font-semibold text-ssb-navy">{value}</p>
+    <div className={cn("px-2.5", !first && "border-l border-slate-200")}>
+      <p className="text-[10.5px] leading-tight text-slate-500">{label}</p>
+      <p className="mt-1 text-[13.5px] font-bold leading-tight text-ssb-navy">{value}</p>
     </div>
   );
 }

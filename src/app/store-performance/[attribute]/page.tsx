@@ -1,6 +1,6 @@
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { ActionQuad } from "@/components/action-quad";
-import { AttributeScoreHeader } from "@/components/attribute-score-header";
+import { AttributeScoreHeader, AttributeScoreStrip } from "@/components/attribute-score-header";
 import { IconTile } from "@/components/icon-tile";
 import { InventoryScreen } from "@/components/inventory-screen";
 import { ShowroomFloor } from "@/components/showroom-floor";
@@ -18,12 +18,15 @@ import type { AttributeKey } from "@/lib/types";
 import {
   AlertTriangle,
   BedDouble,
+  DollarSign,
   Megaphone,
   Puzzle,
+  Tag,
   Truck,
   Users,
 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const SLUGS: Record<string, AttributeKey> = {
   "sales-associate": "salesAssociate",
@@ -81,31 +84,28 @@ export default async function AttributePage({
     return (
       <AppShell store={store} pathname="/store-performance" fill>
         <div className="flex h-full min-h-0 flex-col">
-          <div className="mb-2 flex shrink-0 items-start justify-between gap-3">
-            <PageHeader title={copy.title} subtitle={copy.subtitle} />
-            <div className="flex items-center gap-2 pt-1">
-              <AttributeScoreHeader
-                storeLabel={storeLabel}
-                storeScore={score}
-                clusterScore={bench.cluster}
-                topScore={bench.top}
-              />
-              <div className="max-w-[220px] rounded-[16px] bg-[#eaf3ff] px-3 py-2">
-                <p className="flex items-start gap-1.5 text-[11px] leading-snug text-ssb-navy">
-                  <Megaphone className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ssb-blue" />
-                  <span>
-                    <span className="font-semibold">5 of 31 display positions</span> materially underperform top-peer
-                    productivity.
-                  </span>
+          <PageHeader title={copy.title} subtitle={copy.subtitle} />
+          <AttributeScoreStrip
+            storeLabel={storeLabel}
+            storeScore={score}
+            clusterScore={bench.cluster}
+            topScore={bench.top}
+            callout={
+              <div className="flex max-w-[290px] items-start gap-2.5">
+                <Megaphone className="mt-0.5 h-5 w-5 shrink-0 text-ssb-blue" />
+                <p className="text-[13px] leading-snug text-slate-600">
+                  <span className="text-[15px] font-semibold text-ssb-blue">5 of 31 display positions</span>
+                  <br />
+                  materially underperform top-peer productivity.
                 </p>
               </div>
-            </div>
-          </div>
-          <div className="mb-2.5 grid shrink-0 grid-cols-4 gap-2.5">
-            <MiniKpi icon={<BedDouble className="h-4 w-4" />} tone="blue" value="31" label="Display Slots" />
-            <MiniKpi icon={<span className="text-sm font-bold">$</span>} tone="green" value="$24.8K" label="Revenue / Slot" />
-            <MiniKpi icon={<AlertTriangle className="h-4 w-4" />} tone="amber" value="5" label="Underproductive Slots" />
-            <MiniKpi icon={<Puzzle className="h-4 w-4" />} tone="violet" value="2" label="Customer-Need Gaps" />
+            }
+          />
+          <div className="my-3 grid shrink-0 grid-cols-4 gap-3">
+            <MiniKpi icon={<BedDouble className="h-5 w-5" />} tone="blue" value="31" label="Display Slots" />
+            <MiniKpi icon={<DollarSign className="h-5 w-5" />} tone="green" value="$24.8K" label="Revenue / Slot" />
+            <MiniKpi icon={<AlertTriangle className="h-5 w-5" />} tone="amber" value="5" label="Underproductive Slots" />
+            <MiniKpi icon={<Puzzle className="h-5 w-5" />} tone="violet" value="2" label="Customer-Need Gaps" />
           </div>
           <ShowroomFloor />
         </div>
@@ -117,7 +117,7 @@ export default async function AttributePage({
     return (
       <AppShell store={store} pathname="/store-performance" fill>
         <div className="flex h-full min-h-0 flex-col">
-          <div className="mb-2 flex shrink-0 items-end justify-between gap-4">
+          <div className="mb-3 flex shrink-0 items-end justify-between gap-4">
             <PageHeader title={copy.title} subtitle={copy.subtitle} />
             <AttributeScoreHeader
               storeLabel={storeLabel}
@@ -126,11 +126,11 @@ export default async function AttributePage({
               topScore={bench.top}
             />
           </div>
-          <div className="mb-2.5 flex shrink-0 items-start gap-2 rounded-[16px] bg-[#eaf3ff] px-4 py-2">
-            <IconTile tone="blue" size="sm">
-              <Truck className="h-3.5 w-3.5" />
+          <div className="mb-3 flex shrink-0 items-start gap-3 rounded-[16px] bg-[#eaf3ff] px-4 py-3">
+            <IconTile tone="blue" size="md">
+              <Truck className="h-5 w-5" />
             </IconTile>
-            <p className="text-[13px] leading-snug text-ssb-navy">
+            <p className="text-[13.5px] leading-snug text-ssb-navy">
               <span className="font-semibold">Availability and delivery are the biggest operational constraints on demand capture. </span>
               Improving in-stock levels and delivery performance helps you convert more shoppers and reduce lost sales.
             </p>
@@ -144,7 +144,7 @@ export default async function AttributePage({
   return (
     <AppShell store={store} pathname="/store-performance" fill>
       <div className="flex h-full min-h-0 flex-col">
-        <div className="mb-2 flex shrink-0 items-end justify-between gap-4">
+        <div className="mb-3 flex shrink-0 items-end justify-between gap-4">
           <PageHeader title={copy.title} subtitle={copy.subtitle} />
           <AttributeScoreHeader
             storeLabel={storeLabel}
@@ -173,14 +173,41 @@ function MiniKpi({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-[16px] border border-slate-200 bg-white px-4 py-2.5">
-      <IconTile tone={tone} size="sm">
+    <div className="flex items-center gap-3.5 rounded-[16px] border border-slate-200 bg-white px-5 py-2.5">
+      <IconTile tone={tone} size="md">
         {icon}
       </IconTile>
       <div>
-        <p className="text-[22px] font-semibold leading-none text-ssb-navy">{value}</p>
-        <p className="text-[11px] text-slate-400">{label}</p>
+        <p className="text-[24px] font-bold leading-none text-ssb-navy">{value}</p>
+        <p className="mt-1 text-[12.5px] text-slate-500">{label}</p>
       </div>
+    </div>
+  );
+}
+
+function PanelHeading({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
+  return (
+    <div className="mb-2 flex items-center gap-2.5">
+      <IconTile tone="blue" size="sm">
+        {icon}
+      </IconTile>
+      <div>
+        <h3 className="text-[17px] font-semibold text-ssb-navy">{title}</h3>
+        <p className="text-[12.5px] text-slate-500">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+function ColumnHeader({ cols }: { cols: string[] }) {
+  return (
+    <div className="grid grid-cols-[1fr_70px_70px_70px] gap-x-2 px-3 pb-1.5 text-[12px] font-medium text-slate-500">
+      <span />
+      {cols.map((c) => (
+        <span key={c} className="text-right">
+          {c}
+        </span>
+      ))}
     </div>
   );
 }
@@ -189,29 +216,39 @@ function SalesFill({ storeId }: { storeId: string }) {
   const store = getStore(storeId);
   const caps = capabilitiesFor(store);
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+    <div className="grid min-h-0 flex-1 grid-cols-[1.05fr_0.95fr] gap-3">
       <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
-        <p className="mb-2 flex items-center gap-2 text-[14px] font-semibold text-ssb-navy">
-          <IconTile tone="blue" size="sm">
-            <Users className="h-3.5 w-3.5" />
-          </IconTile>
-          Capability Benchmark
-        </p>
-        <ul className="min-h-0 flex-1 space-y-1.5 overflow-hidden">
-          {caps.map((cap) => (
-            <li key={cap.id} className="grid grid-cols-[1fr_44px_44px_44px] items-center gap-2 rounded-xl bg-[#f6f9fc] px-3 py-1.5">
+        <PanelHeading
+          icon={<Users className="h-5 w-5" />}
+          title="Capability Benchmark"
+          subtitle="Selling capabilities scored against the cluster and top stores."
+        />
+        <ColumnHeader cols={["Your Store", "Cluster Avg.", "Top Stores"]} />
+        <ul className="flex min-h-0 flex-1 flex-col">
+          {caps.map((cap, i) => (
+            <li
+              key={cap.id}
+              className={cn(
+                "grid flex-1 grid-cols-[1fr_70px_70px_70px] items-center gap-2 rounded-[10px] px-3",
+                i % 2 === 0 ? "bg-[#f4f8fd]" : "bg-white",
+              )}
+            >
               <div>
-                <p className="text-[12px] font-semibold text-ssb-navy">{cap.label}</p>
-                <p className="text-[10px] leading-tight text-slate-400">{cap.insight}</p>
+                <p className="text-[14px] font-semibold text-ssb-navy">{cap.label}</p>
+                <p className="text-[11.5px] leading-tight text-slate-500">{cap.insight}</p>
               </div>
-              <p className="text-right text-[13px] font-semibold tabular-nums text-ssb-navy">{cap.store}</p>
-              <p className="text-right text-[12px] tabular-nums text-slate-400">{cap.cluster}</p>
-              <p className="text-right text-[12px] tabular-nums text-slate-400">{cap.top}</p>
+              <p className="text-right text-[20px] font-bold tabular-nums text-ssb-navy">{cap.store}</p>
+              <p className="text-right text-[16px] tabular-nums text-slate-500">{cap.cluster}</p>
+              <p className="text-right text-[16px] tabular-nums text-slate-500">{cap.top}</p>
             </li>
           ))}
         </ul>
       </section>
-      <ActionQuad recommendation={recommendation("salesAssociate")} intro="Close the gap on needs discovery and objection handling." />
+      <ActionQuad
+        accent
+        recommendation={recommendation("salesAssociate")}
+        intro="Close the gap on needs discovery and objection handling."
+      />
     </div>
   );
 }
@@ -220,38 +257,46 @@ function AlignmentFill({ storeId }: { storeId: string }) {
   const store = getStore(storeId);
   const needs = needsFor(store);
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+    <div className="grid min-h-0 flex-1 grid-cols-[1.05fr_0.95fr] gap-3">
       <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
-        <p className="mb-2 text-[14px] font-semibold text-ssb-navy">Need Coverage vs Local Demand</p>
-        <ul className="min-h-0 flex-1 space-y-1.5">
+        <PanelHeading
+          icon={<Puzzle className="h-5 w-5" />}
+          title="Need Coverage vs Local Demand"
+          subtitle="How well the assortment covers each dominant local sleep need."
+        />
+        <ul className="flex min-h-0 flex-1 flex-col gap-2">
           {needs.map((need) => (
-            <li key={need.id} className="rounded-xl bg-[#f6f9fc] px-3 py-1.5">
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-[12px] font-semibold text-ssb-navy">{need.label}</span>
+            <li key={need.id} className="flex flex-1 flex-col justify-center rounded-[12px] bg-[#f4f8fd] px-4 py-2">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-[14px] font-semibold text-ssb-navy">{need.label}</span>
                 <span
                   className={
                     need.status === "Covered"
-                      ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-green"
+                      ? "rounded-full bg-[#d1fae5] px-2.5 py-0.5 text-[12px] font-semibold text-[#047857]"
                       : need.status === "Watch"
-                        ? "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-amber"
-                        : "rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-ssb-red"
+                        ? "rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[12px] font-semibold text-[#b45309]"
+                        : "rounded-full bg-[#fee2e2] px-2.5 py-0.5 text-[12px] font-semibold text-[#b91c1c]"
                   }
                 >
                   {need.status}
                 </span>
               </div>
-              <div className="relative h-1.5 rounded-full bg-slate-200">
+              <div className="relative h-2.5 rounded-full bg-slate-200">
                 <div className="absolute inset-y-0 left-0 rounded-full bg-slate-300" style={{ width: `${need.demand}%` }} />
                 <div className="absolute inset-y-0 left-0 rounded-full bg-ssb-blue" style={{ width: `${need.coverage}%` }} />
               </div>
-              <p className="mt-0.5 text-[10px] text-slate-400">
+              <p className="mt-1 text-[12px] text-slate-500">
                 Demand {need.demand} · Coverage {need.coverage} · Top peer {need.topPeerMedian}
               </p>
             </li>
           ))}
         </ul>
       </section>
-      <ActionQuad recommendation={recommendation("customerAlignment")} intro="Expand cooling where local demand is high and coverage is thin." />
+      <ActionQuad
+        accent
+        recommendation={recommendation("customerAlignment")}
+        intro="Expand cooling where local demand is high and coverage is thin."
+      />
     </div>
   );
 }
@@ -260,28 +305,47 @@ function PricingFill({ storeId }: { storeId: string }) {
   const store = getStore(storeId);
   const metrics = pricingFor(store);
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[1.15fr_0.85fr] gap-3">
+    <div className="grid min-h-0 flex-1 grid-cols-[1.05fr_0.95fr] gap-3">
       <section className="flex min-h-0 flex-col rounded-[18px] border border-slate-200 bg-white p-4">
-        <p className="mb-2 text-[14px] font-semibold text-ssb-navy">Pricing Benchmark</p>
-        <ul className="space-y-1.5">
-          {metrics.map((m) => (
-            <li key={m.id} className="grid grid-cols-[1fr_70px_70px_70px] items-center gap-2 rounded-xl bg-[#f6f9fc] px-3 py-2">
-              <p className="text-[12px] font-semibold text-ssb-navy">{m.label}</p>
-              <p className="text-right text-[13px] font-semibold tabular-nums text-ssb-navy">{m.storeValue}</p>
-              <p className="text-right text-[12px] tabular-nums text-slate-400">
+        <PanelHeading
+          icon={<Tag className="h-5 w-5" />}
+          title="Pricing Benchmark"
+          subtitle="Price realization and step-up performance versus comparable stores."
+        />
+        <ColumnHeader cols={["Your Store", "Cluster Avg.", "Top Stores"]} />
+        <ul className="flex min-h-0 flex-1 flex-col">
+          {metrics.map((m, i) => (
+            <li
+              key={m.id}
+              className={cn(
+                "grid flex-1 grid-cols-[1fr_70px_70px_70px] items-center gap-2 rounded-[10px] px-3",
+                i % 2 === 0 ? "bg-[#f4f8fd]" : "bg-white",
+              )}
+            >
+              <p className="text-[14px] font-semibold text-ssb-navy">{m.label}</p>
+              <p className="text-right text-[20px] font-bold tabular-nums text-ssb-navy">{m.storeValue}</p>
+              <p className="text-right text-[16px] tabular-nums text-slate-500">
                 {m.format === "currency" ? `$${m.peerNumeric.toLocaleString("en-US")}` : `${m.peerNumeric}%`}
               </p>
-              <p className="text-right text-[12px] tabular-nums text-slate-400">
+              <p className="text-right text-[16px] tabular-nums text-slate-500">
                 {m.format === "currency" ? `$${m.topNumeric.toLocaleString("en-US")}` : `${m.topNumeric}%`}
               </p>
             </li>
           ))}
         </ul>
-        <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-[12px] text-ssb-navy">
-          <span className="font-semibold">Biggest gap: </span>Premium step-up. Customers often buy within the first tier shown.
+        <div className="mt-3 flex shrink-0 items-start gap-2.5 rounded-[12px] bg-[#fef3c7] px-4 py-3 text-[13px] text-ssb-navy">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#b45309]" />
+          <span>
+            <span className="font-semibold">Biggest gap: </span>Premium step-up. Customers often buy within the first
+            tier shown.
+          </span>
         </div>
       </section>
-      <ActionQuad recommendation={recommendation("pricingPromotion")} intro="Standardize Good / Better / Best after needs discovery." />
+      <ActionQuad
+        accent
+        recommendation={recommendation("pricingPromotion")}
+        intro="Standardize Good / Better / Best after needs discovery."
+      />
     </div>
   );
 }
